@@ -1,0 +1,106 @@
+plugins {
+	id 'java'
+	id 'idea'
+	id 'jacoco'
+	id 'checkstyle'
+	id 'org.sonarqube'                          version libs.versions.sonarqube
+	id 'org.springframework.boot'               version libs.versions.spring
+	id 'io.spring.dependency-management'        version libs.versions.springDependencyManagement
+}
+
+group = 'com.example.codebase'
+version = '1.0-SNAPSHOT'
+description = 'This is a sample template project'
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
+
+[compileJava, compileTestJava]*.options.collect {options -> options.encoding = 'UTF-8'}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+	maven {
+		url = uri('https://repo.maven.apache.org/maven2/')
+	}
+}
+
+dependencies {
+	compileOnly 							libs.lombok
+	annotationProcessor 					libs.lombok
+	implementation 							libs.springbootStarterWeb
+	implementation							libs.springbootStarterActuator
+	implementation							libs.spingbootDataJpa
+	implementation							libs.feign
+	implementation							libs.liquibase
+	implementation							libs.mapstruct
+	annotationProcessor						libs.mapstructProcessor
+	runtimeOnly								libs.postgres
+	testImplementation 						libs.springbootStarterTest
+
+	implementation							'org.springframework.cloud:spring-cloud-starter-openfeign'
+}
+
+ext {
+	set('springCloudVersion', '2023.0.0')
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+jacocoTestReport {
+	reports {
+		xml.required = false
+		csv.required = false
+		html.outputLocation = layout.buildDirectory.dir('jacocoTestReport')
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+	testLogging {
+		events('passed', 'failed', 'skipped')
+	}
+}
+
+test.finalizedBy jacocoTestReport
+
+checkstyle {
+	configFile = file("${rootDir}/codequality/checkstyle.xml")
+	toolVersion = '10.12.3'
+	checkstyleTest.enabled = false
+}
+
+tasks.register('checkstyle', Checkstyle) {
+	checkstyleMain.source = "src/main/java"
+	ignoreFailures = true
+	showViolations = true
+	reports {
+		xml.enabled false
+		html.enabled true
+	}
+}
+
+sonarqube {
+	properties {
+		property "sonar.host.url", "http://localhost:9001/"
+		property "sonar.login", "admin"
+		property "sonar.password", "password"
+		property "sonar.projectKey", "codebase"
+		property "sonar.projectName", "codebase"
+		property "sonar.sourceEncoding", "UTF-8"
+		property "sonar.verbose", "true"
+		property 'sonar.coverage.exclusions', ''
+	}
+}

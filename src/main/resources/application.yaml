@@ -1,0 +1,23 @@
+spring:
+  profiles:
+    active:
+      # in case using another profile
+      #- stg
+  datasource:
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 5
+    url: jdbc:postgresql://localhost:5432/codebasedb
+    username: postgres
+    password: postgres
+app:
+  client:
+    name: client_name
+    url: client_url
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+log4j:
+  configurationFile: classpath:log4j2.xml

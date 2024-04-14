@@ -1,0 +1,48 @@
+version: '3.8'
+networks:
+  tms:
+    name: app
+    driver: bridge
+volumes:
+  postgres_data:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+services:
+  db:
+    image: postgres:latest
+    container_name: tms
+    restart: always
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+    networks:
+      - tms
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_MULTIPLE_DATABASES: |-
+        codebasedb,sonardb
+      PGDATA: /var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 1m
+      timeout: 10s
+      retries: 2
+  sonarqube:
+    image: sonarqube:community
+    depends_on:
+      - db
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://db:5432/sonardb
+      SONAR_JDBC_USERNAME: postgres
+      SONAR_JDBC_PASSWORD: postgres
+    networks:
+      - tms
+    volumes:
+      - sonarqube_data:/otp/sonarqube/data
+      - sonarqube_extensions:/otp/sonarqube/extensions
+      - sonarqube_logs:/otp/sonarqube/logs
+    ports:
+      - '9001:9000'
