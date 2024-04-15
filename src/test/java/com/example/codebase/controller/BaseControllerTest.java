@@ -1,6 +1,5 @@
 package com.example.codebase.controller;
 
-import com.example.codebase.controller.BaseController;
 import com.example.codebase.dto.UserDto;
 import com.example.codebase.dto.request.SignInRequestDto;
 import com.example.codebase.service.auth.AuthService;

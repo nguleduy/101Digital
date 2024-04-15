@@ -12,15 +12,19 @@ import com.example.codebase.service.MenuService;
 import com.example.codebase.service.QueueService;
 import com.example.codebase.service.ShopService;
 import com.example.codebase.service.auth.AuthService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Shop controller.
  */
+@RestController
 @RequestMapping(Path.SHOP)
+@Tag(name = "Shops")
 public class ShopController extends BaseController {
     private final ShopService shopService;
     private final MenuService menuService;

@@ -21,4 +21,9 @@ public class UserDto {
     public UserDto(Long id) {
         this.id = id;
     }
+
+    public UserDto(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 }

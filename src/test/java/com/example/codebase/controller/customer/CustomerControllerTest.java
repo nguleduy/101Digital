@@ -1,5 +1,7 @@
 package com.example.codebase.controller.customer;
 
+import com.example.codebase.dto.OrderDto;
+import com.example.codebase.dto.QueueDto;
 import com.example.codebase.dto.ShopDto;
 import com.example.codebase.dto.UserDto;
 import com.example.codebase.dto.request.SignInRequestDto;
@@ -17,6 +19,9 @@ import java.util.List;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class CustomerControllerTest {
@@ -69,5 +74,44 @@ class CustomerControllerTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1, Objects.requireNonNull(response.getBody()).size());
+    }
+
+    @Test
+    void placeOrder_Successful() {
+        OrderDto orderDto = new OrderDto(1L);
+        QueueDto expectedQueueDto = new QueueDto(1L);
+        when(customerService.placeOrder(any())).thenReturn(expectedQueueDto);
+
+        ResponseEntity<QueueDto> response = customerController.placeOrder(orderDto);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedQueueDto, response.getBody());
+        verify(customerService, times(1)).placeOrder(orderDto);
+    }
+
+    @Test
+    void viewQueueByShop_Successful() {
+        Long shopId = 1L;
+        List<QueueDto> expectedQueueList = Collections.singletonList(new QueueDto(1L));
+        when(customerService.viewQueueByShop(shopId)).thenReturn(expectedQueueList);
+
+        ResponseEntity<List<QueueDto>> response = customerController.viewQueueByShop(shopId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedQueueList, response.getBody());
+        verify(customerService, times(1)).viewQueueByShop(shopId);
+    }
+
+    @Test
+    void cancelOrder_Successful() {
+        OrderDto orderDto = new OrderDto(1L);
+        QueueDto expectedQueueDto = new QueueDto(1L);
+        when(customerService.cancelOrder(any())).thenReturn(expectedQueueDto);
+
+        ResponseEntity<QueueDto> response = customerController.cancelOrder(orderDto);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedQueueDto, response.getBody());
+        verify(customerService, times(1)).cancelOrder(orderDto);
     }
 }

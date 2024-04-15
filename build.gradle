@@ -47,6 +47,7 @@ dependencies {
 	testImplementation 						libs.springbootStarterTest
 
 	implementation							'org.springframework.cloud:spring-cloud-starter-openfeign'
+	implementation							libs.springdoc
 }
 
 ext {
@@ -61,9 +62,50 @@ dependencyManagement {
 
 jacocoTestReport {
 	reports {
-		xml.required = false
+		xml.required = true
 		csv.required = false
 		html.outputLocation = layout.buildDirectory.dir('jacocoTestReport')
+	}
+	afterEvaluate {
+		classDirectories.setFrom(
+				fileTree(dir: "build/classes/java/main", excludes: [
+						'**/client/**',
+						'**/configuration/**',
+						'**/constant/**',
+						'**/dto/**',
+						'**/exception/**',
+						'**/mapper/**',
+						'**/model/**',
+						'**/repository/**',
+						'**/util/**',
+						'**/client/**',
+						'**/CodebaseApplication.class'])
+		)
+	}
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				minimum = 0.95
+			}
+		}
+	}
+	afterEvaluate {
+		classDirectories.setFrom(
+				fileTree(dir: "build/classes/java/main", excludes: [
+						'**/client/**',
+						'**/configuration/**',
+						'**/constant/**',
+						'**/dto/**',
+						'**/exception/**',
+						'**/mapper/**',
+						'**/model/**',
+						'**/repository/**',
+						'**/util/**',
+						'**/CodebaseApplication.class'])
+		)
 	}
 }
 
@@ -74,7 +116,7 @@ tasks.named('test') {
 	}
 }
 
-test.finalizedBy jacocoTestReport
+test.finalizedBy jacocoTestReport, jacocoTestCoverageVerification
 
 checkstyle {
 	configFile = file("${rootDir}/codequality/checkstyle.xml")
@@ -101,6 +143,18 @@ sonarqube {
 		property "sonar.projectName", "codebase"
 		property "sonar.sourceEncoding", "UTF-8"
 		property "sonar.verbose", "true"
-		property 'sonar.coverage.exclusions', ''
+		property "sonar.core.codeCoveragePlugin", "jacoco"
+		property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+		property "sonar.exclusions",
+				"**/com/example/codebase/client/**," +
+				"**/com/example/codebase/configuration/**," +
+				"**/com/example/codebase/constant/**," +
+				"**/com/example/codebase/dto/**," +
+				"**/com/example/codebase/exception/**," +
+				"**/com/example/codebase/mapper/**," +
+				"**/com/example/codebase/model/**," +
+				"**/com/example/codebase/repository/**," +
+				"**/com/example/codebase/util/**," +
+				"**/com/example/codebase/CodebaseApplication.class"
 	}
 }

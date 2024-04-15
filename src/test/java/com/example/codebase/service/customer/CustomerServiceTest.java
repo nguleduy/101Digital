@@ -1,4 +1,4 @@
-package com.example.codebase.service;
+package com.example.codebase.service.customer;
 
 import com.example.codebase.dto.MenuDto;
 import com.example.codebase.dto.OrderDto;
@@ -14,11 +14,11 @@ import com.example.codebase.model.Shop;
 import com.example.codebase.repository.OrderRepository;
 import com.example.codebase.repository.QueueRepository;
 import com.example.codebase.repository.ShopRepository;
-import com.example.codebase.service.customer.CustomerServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-class CustomerServiceImplTest {
-
+class CustomerServiceTest {
     @Mock
     private ShopRepository shopRepository;
 
@@ -44,7 +43,7 @@ class CustomerServiceImplTest {
     @InjectMocks
     private CustomerServiceImpl customerService;
 
-    public CustomerServiceImplTest() {
+    public CustomerServiceTest() {
         MockitoAnnotations.openMocks(this);
     }
 
@@ -68,6 +67,17 @@ class CustomerServiceImplTest {
         List<ShopDto> actual = customerService.findNearestShops(latitude, longitude);
 
         assertEquals(expected.size(), actual.size());
+    }
+
+    @Test
+    void findNearestShops_NoShopsFound() {
+        double latitude = 1.0;
+        double longitude = 1.0;
+        when(shopRepository.findAll()).thenReturn(Collections.emptyList());
+
+        CustomException exception = assertThrows(CustomException.class, () -> customerService.findNearestShops(latitude, longitude));
+        assertEquals(HttpStatus.NOT_FOUND.value(), exception.getErrorCode());
+        assertEquals("There is no shops near by you.", exception.getMessage());
     }
 
     @Test

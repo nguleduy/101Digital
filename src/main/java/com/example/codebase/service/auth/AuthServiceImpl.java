@@ -6,6 +6,7 @@ import com.example.codebase.exception.CustomException;
 import com.example.codebase.mapper.UserMapper;
 import com.example.codebase.model.User;
 import com.example.codebase.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
  * AuthServiceImpl.
  */
 @Service
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
@@ -30,16 +32,19 @@ public class AuthServiceImpl implements AuthService {
     public UserDto login(SignInRequestDto request) {
         User user = userRepository.findByUsername(request.username());
         if (user != null && passwordEncoder.matches(request.password(), user.getPassword())) {
+            log.info("Login successful.");
             return UserMapper.INSTANCE.toDto(user);
-        } else {
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR.value(), "User not found");
         }
+
+        log.error("User not found");
+        throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR.value(), "User not found");
     }
 
     @Override
     public UserDto signUp(UserDto request) {
         User user = userRepository.findByUsername(request.getUsername());
         if (user != null) {
+            log.error("Username already exists");
             throw new CustomException(HttpStatus.CONFLICT.value(), "Username already exists");
         }
 
@@ -48,6 +53,7 @@ public class AuthServiceImpl implements AuthService {
 
         User savedUser = userRepository.save(UserMapper.INSTANCE.toEntity(request));
 
+        log.info("Signup successful.");
         return UserMapper.INSTANCE.toDto(savedUser);
     }
 }

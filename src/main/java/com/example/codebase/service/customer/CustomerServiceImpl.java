@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Customer service impl.
  */
 @Service
+@Slf4j
 public class CustomerServiceImpl implements CustomerService {
 
     private final ShopRepository shopRepository;
@@ -53,7 +55,12 @@ public class CustomerServiceImpl implements CustomerService {
                                 shop.getLatitude(),
                                 shop.getLongitude())))
                 .collect(Collectors.toList());
-
+        if (shops.isEmpty()) {
+            log.error("There is no shops near by you.");
+            throw new CustomException(HttpStatus.NOT_FOUND.value(),
+                    "There is no shops near by you.");
+        }
+        log.info("Fetch nearest shops successful. {}", shops);
         return ShopMapper.INSTANCE.toListDto(shops);
     }
 
@@ -75,10 +82,12 @@ public class CustomerServiceImpl implements CustomerService {
     @Transactional
     public QueueDto placeOrder(OrderDto dto) {
         Order order = orderRepository.save(OrderMapper.INSTANCE.toEntity(dto));
+        log.info("Save Order successful. {}", order);
         Queue queue = queueRepository.save(
                 Queue.builder()
                         .shop(order.getShop())
                         .order(order).build());
+        log.info("Save Queue successful. {}", queue);
         return QueueMapper.INSTANCE.toDto(queue);
     }
 
@@ -97,9 +106,11 @@ public class CustomerServiceImpl implements CustomerService {
             queue.get().setDisabled(true);
             Queue result = queue.get();
             queueRepository.save(result);
+            log.info("Save Queue successful.");
             return QueueMapper.INSTANCE.toDto(result);
         }
 
+        log.error("Order not found");
         throw new CustomException(HttpStatus.NOT_FOUND.value(), "Order not found");
     }
 }
