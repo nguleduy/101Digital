@@ -1,5 +1,72 @@
 # 101Digital Assignment Local Development
 
+## High-Level Diagram
+                        +------------------------+
+                        |      Coffee Shop       |
+                        |      Application       |
+                        +------------------------+
+                                /        \
+                               /          \
+                              /            \
+                +--------------+           +---------------+
+                | Operator Panel|          | Customer Panel|
+                +--------------+           +---------------+
+                        |                            |
+                        |                            |
+                +---------------+             +---------------+
+                |   Functions  |              |   Functions  |
+                +---------------+             +---------------+
+                        |                              |
+                        |                              |
+                +------------------+       +---------------------+
+                | Operator         |       | Customer            |
+                |   App Functions  |       |   App Functions     |
+                +------------------+       +---------------------+
+
+## Sequence Diagram
+### Admin Login Sequence:
+- Operator -> Coffee Shop App: Login request
+- Coffee Shop App -> Database: Validate credentials
+- Database --> Coffee Shop App: Valid/Invalid
+- Coffee Shop App --> Operator Panel: Authentication response
+### Setup and Configuration Sequence:
+- Operator -> Coffee Shop App: Configure settings request
+- Coffee Shop App -> Database: Update settings
+- Database --> Coffee Shop App: Success message
+### Operator Functions Sequence:
+- Operator -> Coffee Shop App: Login request
+- Coffee Shop App -> Database: Validate credentials
+- Database --> Coffee Shop App: Valid/Invalid
+- Coffee Shop App --> Operator Panel: Authentication response
+- Operator Panel -> Coffee Shop App: View Queue Size request
+- Coffee Shop App -> Database: Retrieve queue information
+- Database --> Coffee Shop App: Queue details
+- Coffee Shop App --> Operator Panel: Display queue size
+### Customer Registration Sequence:
+- Customer -> Coffee Shop App: Registration request
+- Coffee Shop App -> Database: Save customer data
+- Database --> Coffee Shop App: Success message
+- Coffee Shop App --> Customer App: Registration confirmation
+### Place Online Orders Sequence:
+- Customer -> Coffee Shop App: Browse menu
+- Coffee Shop App -> Database: Retrieve menu
+- Database --> Coffee Shop App: Menu items
+- Coffee Shop App --> Customer App: Display menu
+- Customer App -> Coffee Shop App: Place order request
+- Coffee Shop App -> Database: Save order
+- Database --> Coffee Shop App: Success message
+- Coffee Shop App --> Customer App: Order confirmation
+### Queue Information Sequence:
+- Customer -> Coffee Shop App: Queue information request
+- Coffee Shop App -> Database: Retrieve customer queue details
+- Database --> Coffee Shop App: Queue information
+- Coffee Shop App --> Customer App: Display queue position and waiting time
+### Exit Queue Sequence:
+- Customer -> Coffee Shop App: Exit queue request
+- Coffee Shop App -> Database: Cancel customer order
+- Database --> Coffee Shop App: Success message
+- Coffee Shop App --> Customer App: Order cancellation confirmation
+
 ## Tools
 
 Please install following tools
